@@ -1,0 +1,71 @@
+
+<div class="container pt-2">
+  <!--Welcoming--> <div class="row">
+
+    <div class="col-md-3 text-white">
+      Welcome To Notes :)
+    </div>
+  </div>
+
+  <!--Search--><div class="row">
+  <div class="col-md-3 pt-2">
+    <input class="form-control" type="text" placeholder="Search"
+           aria-label="Search" [(ngModel)]="searchValue">
+  </div>
+
+  <div class="col-md-1 ml-2">
+    <input type="submit" class="btn btn-default text-info" value="Sort" (click)="onSort()" />
+  </div>
+</div>
+
+  <!--Displaying Notes--><div class="row pt-2">
+
+  <!--Listing Notes--><div class="col-md-4">
+  <div class="list-group" *ngFor="let note of filteredNotesList">
+    <a class="list-group-item active bg-info list-group-item-action mb-1" (click)="onView(note)">
+      <h4 class="list-group-item-heading">{{note.noteTitle}}</h4>
+    </a>
+  </div>
+  <input type="submit" class="btn btn-success mt-2" value="New Note" (click)="onNew()" />
+  <input type="submit" class="btn btn-danger ml-2 mt-2" value="Delete All Notes" (click)="onOpenDialog(notesList.length)" *ngIf="notesList.length > 0"/>
+</div>
+
+  <!--Displaying Body--><div class="col-md-6" *ngIf="noteBodyShow">
+    <div>
+      <h2 class="text-white active text-center">{{note.noteTitle}}</h2>
+      <div class="form-group">
+        <textarea [(ngModel)]="tempNoteBody" class="form-control" rows="5">{{tempNoteBody}}</textarea>
+      </div>
+    </div>
+    <div>
+    <input type="submit" class="btn btn-success" value="Save" (click)="onSave()"/>
+     <input type="submit" class="btn btn-danger ml-2" value="Delete" (click)="onOpenDialog(0)"/>
+    </div>
+  </div>
+
+  <!--New Note--><div #newNoteDesign class="col-md-8 border" *ngIf="newNoteShow">
+  <h3 class="mb-1 mt-1 text-info text-center">Add New Note</h3>
+  <form (submit)="onAddNote()" novalidate #theForm="ngForm">
+
+                     <div class="form-group">
+                       <label for="noteTitle" class="text-white">Note Title*</label>
+                       <input class="form-control" name="noteTitle" [(ngModel)]="tempNoteTitle" required placeholder="Note Title" />
+                     </div>
+
+                     <div class="form-group">
+                       <label for="noteBody" class="text-white">Note Body</label>
+                       <textarea class="form-control" name="noteBody" [(ngModel)]="tempNoteBody" placeholder="Note body" rows="10"></textarea>
+                     </div>
+
+                     <div class="form-group">
+                       <input type="submit" class="btn btn-success" value="Add" [disabled]="theForm.invalid" />
+                       <a class="btn btn-default text-white" (click)="onCancelAddNote()">Cancel</a>
+                     </div>
+
+                   </form>
+  </div>
+
+</div>
+
+
+</div>
