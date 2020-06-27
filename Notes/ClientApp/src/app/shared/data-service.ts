@@ -1,35 +1,35 @@
 import { HttpClient, HttpErrorResponse } from "@angular/common/http";
 import { Observable, throwError } from "rxjs";
 import { INote } from "./note";
-import { map, tap, catchError } from "rxjs/operators";
+import { catchError } from "rxjs/operators";
 import { Injectable } from "@angular/core";
 
 @Injectable()
 export class DataService {
 
-  private baseUrl = 'api/';
-  private deleteAllUrl = 'api/notes2/all/notes';
+  private baseUrl = 'api/notes/';
+  private deleteAllUrl = 'api/notes';
 
   public notes: INote[] = [];
   constructor(private http: HttpClient) { }
 
   getNotes(): Observable<INote[]> {
-    return this.http.get<INote[]>(this.baseUrl + localStorage.getItem('username') + '/notes')
+    return this.http.get<INote[]>(this.baseUrl)
       .pipe(catchError(this.handleError));
   }
 
   postNote(note: INote) {
-    return this.http.post<INote>(this.baseUrl + localStorage.getItem('username') + '/notes', note)
+    return this.http.post<INote>(this.baseUrl, note)
       .pipe(catchError(this.handleError));
   }
 
   putNote(note: INote) {
-    return this.http.put(this.baseUrl + localStorage.getItem('username') + '/notes/' + note.noteId.toString(), note)
+    return this.http.put(this.baseUrl + note.noteId.toString(), note)
       .pipe(catchError(this.handleError));
   }
 
   deleteNote(note: INote) {
-    return this.http.delete(this.baseUrl + localStorage.getItem('username') + '/notes/' + note.noteId.toString())
+    return this.http.delete(this.baseUrl + note.noteId.toString())
       .pipe(catchError(this.handleError));
   }
 

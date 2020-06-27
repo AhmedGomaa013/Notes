@@ -18,8 +18,4 @@ export class UserService {
   login(user: ILoginUser) {
     return this.http.post(this.baseUrl + 'login', user);
   }
-
-  logout() {
-    return this.http.get(this.baseUrl + 'logout');
-  }
 }

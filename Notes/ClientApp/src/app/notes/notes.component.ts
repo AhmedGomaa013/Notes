@@ -26,7 +26,7 @@ export class NotesComponent implements OnInit {
   set searchValue(value: string) {
     this._searchValue = value;
     this.filteredNotesList = this.searchValue ? this.performFilter(this.searchValue) : this.notesList;
-    //console.log(this._searchValue);
+    
   }
 
   note: INote;
@@ -86,8 +86,11 @@ export class NotesComponent implements OnInit {
     var index: number = this.notesList.indexOf(this.note, 0);
     if (index > -1) {
       this.data.deleteNote(this.notesList[index])
-        .subscribe();
-      this.notesList.splice(index, 1);
+        .subscribe(
+          response => {
+            this.notesList.splice(index, 1);
+          }
+        );
       this.noteBodyShow = false;
     }
   }
@@ -95,8 +98,12 @@ export class NotesComponent implements OnInit {
   onDeleteAll() {
     this.newNoteShow = false;
     this.data.deleteAllNotes()
-      .subscribe();
-    this.notesList.splice(0, this.notesList.length);
+      .subscribe(
+        response => {
+          this.notesList.splice(0, this.notesList.length);
+        }
+      );
+    
     this.noteBodyShow = false;
   }
 

@@ -30,13 +30,17 @@ namespace Notes
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.Configure<ApplicationSettings>(Configuration.GetSection("Tokens"));
 
             services.AddIdentity<NotesUser,IdentityRole>()
                 .AddEntityFrameworkStores<NotesContext>()
                 .AddDefaultTokenProviders();
             services.AddDbContext<NotesContext>(options =>
-                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            {
+                var stringConnection = Environment.GetEnvironmentVariable("ASPNETCORE_CONNECTIONSTRINGS:DeFaultString");
+
+                options.UseSqlServer(stringConnection);
+            }
+            );
             
             services.AddAutoMapper(Assembly.GetEntryAssembly());
 
@@ -45,7 +49,7 @@ namespace Notes
             services.AddControllersWithViews();
 
             //Authentication
-            var key = Encoding.UTF8.GetBytes(Configuration["Tokens:Key"].ToString());
+            var key = Encoding.UTF8.GetBytes(Environment.GetEnvironmentVariable("Token").ToString());
             services.AddAuthentication(options =>
             {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

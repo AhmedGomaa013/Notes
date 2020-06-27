@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace Notes.Controllers
 {
     [Authorize]
-    [Route("api/{user}/notes")]
+    [Route("api/[controller]")]
     [ApiController]
     public class NotesController: Controller
     {
@@ -30,15 +30,16 @@ namespace Notes.Controllers
             _userManager = userManager;
         }
 
+
         [HttpGet]
-        public async Task<IActionResult> Get(string user)
+        // Get => api/Notes
+        public IActionResult Get()
         {
             try
             {
-                string userId = User.Claims.First(o=> o.Type == "UserID").Value;
-                var notesUser = await _userManager.FindByIdAsync(userId);
+                string userName = User.Claims.First(o=> o.Type == "UserName").Value;
 
-                var result = _notesRepository.GetAllUserNotes(notesUser.UserName);
+                var result = _notesRepository.GetAllUserNotes(userName);
                 var notes = _mapper.Map<NoteViewModel[]>(result);
                 
                 return Ok(notes);
@@ -52,15 +53,16 @@ namespace Notes.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post(NoteViewModel model, string user)
+        //Post => api/Notes
+        public async Task<IActionResult> Post(NoteViewModel model)
         {
 
             try
             {
                 if (ModelState.IsValid)
                 {
-                    string userId = User.Claims.First(o => o.Type == "UserID").Value;
-                    var notesUser = await _userManager.FindByIdAsync(userId);
+                    string userName = User.Claims.First(o => o.Type == "UserName").Value;
+                    var notesUser = await _userManager.FindByNameAsync(userName);
 
                     var note = _mapper.Map<Note>(model);
                     if(note.NoteTime == DateTime.MinValue) {
@@ -71,7 +73,7 @@ namespace Notes.Controllers
                     _notesRepository.AddEntity(note);
                     if (_notesRepository.SaveAll())
                     {
-                        return Created($"/api/{user}/notes/", _mapper.Map<NoteViewModel>(note));
+                        return Created($"/api/notes/", _mapper.Map<NoteViewModel>(note));
                     }
                     else
                     { 
@@ -90,16 +92,16 @@ namespace Notes.Controllers
         }
 
         [HttpPut("{id:int}")]
-        public async Task<IActionResult> Put(NoteViewModel model,int id,string user) 
+        //Put => api/Notes/id
+        public IActionResult Put(NoteViewModel model,int id) 
         {
             try
             {
-                string userId = User.Claims.First(o => o.Type == "UserID").Value;
-                var notesUser = await _userManager.FindByIdAsync(userId);
-
-                var note = _notesRepository.GetNoteByUserAndId(id,notesUser.UserName);
-
+                string userName = User.Claims.First(o => o.Type == "UserName").Value;
+                
+                var note = _notesRepository.GetNoteByUserAndId(id,userName);
                 if (note == null) return NotFound("Couldn't find the note");
+                
                 note.NoteBody = model.NoteBody;
 
                 if (_notesRepository.SaveAll())
@@ -118,14 +120,14 @@ namespace Notes.Controllers
         }
        
         [HttpDelete("{id:int}")]
-        public async Task<IActionResult> Delete(int id, string user)
+        //Delete => api/Notes/id
+        public IActionResult Delete(int id)
         {
             try
             {
-                string userId = User.Claims.First(o => o.Type == "UserID").Value;
-                var notesUser = await _userManager.FindByIdAsync(userId);
+                string userName = User.Claims.First(o => o.Type == "UserName").Value;
 
-                var note = _notesRepository.GetNoteByUserAndId(id,notesUser.UserName);
+                var note = _notesRepository.GetNoteByUserAndId(id,userName);
                 if (note == null) return NotFound("Couldn't find the note");
 
                 _notesRepository.DeleteEntity(note);
@@ -146,6 +148,29 @@ namespace Notes.Controllers
             }
         }
 
-        
+        [HttpDelete]
+        public IActionResult Delete()
+        {
+            try
+            {
+                string userName = User.Claims.First(o => o.Type == "UserName").Value;
+
+                _notesRepository.DeleteAllEntities(userName);
+                if (_notesRepository.SaveAll())
+                {
+                    return Ok();
+                }
+                else
+                {
+                    return BadRequest("Failed to delete All Notes");
+                }
+            }
+            catch (Exception)
+            {
+
+                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to get note");
+            }
+        }
+
     }
 }

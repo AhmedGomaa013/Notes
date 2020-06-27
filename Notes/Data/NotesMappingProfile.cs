@@ -14,9 +14,6 @@ namespace Notes.Data
         {
             CreateMap<Note, NoteViewModel>()
                 .ReverseMap();
-
-            CreateMap<NotesUser, RegisterUserViewModel>()
-                .ReverseMap();
         }
     }
 }

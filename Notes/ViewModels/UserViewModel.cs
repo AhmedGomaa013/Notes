@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Notes.ViewModels
 {
-    public class LoginUserViewModel
+    public class UserViewModel
     {
         [Required]
         public string UserName { get; set; }

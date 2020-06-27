@@ -5,6 +5,7 @@ import { ToastrService } from "ngx-toastr";
 import { UserService } from "../shared/user-service";
 import { Router } from "@angular/router";
 import { AuthService } from "../shared/AuthService";
+import { error } from "protractor";
 
 @Component({
   selector: 'signup-component',
@@ -25,36 +26,42 @@ export class SignupComponent implements OnInit {
 
 
   onCreate(): void {
-    this.service.register(this.user)
-      .subscribe(
-        (response: any) => {
-          if (response.succeeded) {
-            this.toastrService.success("New User Created", "Registration Successful");
-            this.errorMessage = "";
-            this.router.navigateByUrl('login');
-          }
-          else {
-            this.errorMessage = "";
-            response.errors.forEach(element => {
-              switch (element.code) {
-                case 'DuplicateUserName':
-                  this.toastrService.error('Username is already taken', 'Registration failed.');
-                  this.errorMessage = "Username is already taken";
-                  break;
+    if (this.user.password == this.user.confirmPassword) {
+      this.errorMessage = "";
+      this.service.register(this.user)
+        .subscribe(
+          (response: any) => {
+            if (response.succeeded) {
+              this.toastrService.success("New User Created", "Registration Successful");
+              this.errorMessage = "";
+              this.router.navigateByUrl('login');
+            }
+            else {
+              this.errorMessage = "";
+              response.errors.forEach(element => {
+                switch (element.code) {
+                  case 'DuplicateUserName':
+                    this.toastrService.error('Username is already taken', 'Registration failed.');
+                    this.errorMessage = "Username is already taken";
+                    break;
 
-                default:
-                  this.toastrService.error(element.description, 'Registration failed.');
-                  this.errorMessage += element.description;
-                  this.errorMessage += '\n';
-                  break;
-              }
-            });
+                  default:
+                    this.toastrService.error(element.description, 'Registration failed.');
+                    this.errorMessage += element.description;
+                    this.errorMessage += '\n';
+                    break;
+                }
+              });
+            }
+          },
+          error => {
+            console.log(error);
           }
-        },
-        error => {
-          console.log(error);
-        }
-      );
+        );
+    }
+    else {
+      this.errorMessage = "Password and Confirm Password don't match";
+    }
   }
 
   ngOnInit(): void {

@@ -22,28 +22,24 @@ namespace Notes.Controllers
     {
         private readonly UserManager<NotesUser> _userManager;
         private readonly SignInManager<NotesUser> _signInManager;
-        private readonly ApplicationSettings appsettings;
+        
 
         public AccountController(UserManager<NotesUser> userManager,
-            SignInManager<NotesUser> signInManager,
-            IOptions<ApplicationSettings> appsettings)
+            SignInManager<NotesUser> signInManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
-            this.appsettings = appsettings.Value;
         }
 
         [HttpPost]
         [Route("Register")]
         //Post => api/Account/register
-        public async Task<ActionResult> Register(RegisterUserViewModel model)
+        public async Task<ActionResult> Register(UserViewModel model)
         {
             try
             {
                 if (ModelState.IsValid)
                 {
-                    if (model.Password == model.ConfirmPassword)
-                    {
                         var applicationUser = new NotesUser()
                         {
                             UserName = model.UserName
@@ -52,9 +48,6 @@ namespace Notes.Controllers
                         var result = await _userManager.CreateAsync(applicationUser, model.Password);
 
                         return Ok(result);
-                    }
-                    else
-                        return BadRequest("Password and Confirm Password don't match");
                 }
                 else
                     return BadRequest(ModelState);
@@ -68,21 +61,22 @@ namespace Notes.Controllers
         [HttpPost]
         [Route("Login")]
         //Post => api/Account/Login
-        public async Task<ActionResult> Login(LoginUserViewModel model)
+        public async Task<ActionResult> Login(UserViewModel model)
         {
             try
             {
                 var user = await _userManager.FindByNameAsync(model.UserName);
+                var key = Environment.GetEnvironmentVariable("Token");
                 if((user != null) && (await _userManager.CheckPasswordAsync(user,model.Password)))
                 {
                     var tokenDecriptor = new SecurityTokenDescriptor
                     {
                         Subject = new ClaimsIdentity(new Claim[]
                         {
-                            new Claim("UserID", user.Id.ToString())
+                            new Claim("UserName", user.UserName)
                         }),
                         Expires = DateTime.Now.AddHours(2),
-                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(appsettings.Key)),
+                        SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
                         SecurityAlgorithms.HmacSha256Signature)
                     };
 
@@ -97,26 +91,10 @@ namespace Notes.Controllers
                     return BadRequest(new { message = "Username or password is incorrect." });
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
 
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to get user data");
-            }
-        }
-
-        [HttpGet]
-        [Route("Logout")]
-        //Get => api/Account/Logout
-        public async Task<ActionResult> Logout()
-        {
-            try
-            {
-                await _signInManager.SignOutAsync();
-                return Ok();
-            }
-            catch (Exception)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError, "Failed to get user data");
+                return StatusCode(StatusCodes.Status500InternalServerError, $"Failed to get user data, err:{e}");
             }
         }
     }
