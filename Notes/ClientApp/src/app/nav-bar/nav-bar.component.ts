@@ -10,17 +10,10 @@ import { AuthService } from "../shared/AuthService";
 
 export class NavBarComponent {
   constructor(private router: Router, private auth: AuthService) { }
-
-  user: string = "";
   
   onLogout() {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     this.router.navigateByUrl('/');
   }
-
-  getUsername() {
-    return localStorage.getItem('username');
-  }
-  
 }

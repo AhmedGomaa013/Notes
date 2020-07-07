@@ -1,11 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { Title } from "@angular/platform-browser";
-import { IRegisterUser } from "../shared/register-user";
+import { IRegisterUser } from "../../shared/register-user";
 import { ToastrService } from "ngx-toastr";
-import { UserService } from "../shared/user-service";
+import { UserService } from "../../shared/user-service";
 import { Router } from "@angular/router";
-import { AuthService } from "../shared/AuthService";
-import { error } from "protractor";
+import { AuthService } from "../../shared/AuthService";
 
 @Component({
   selector: 'signup-component',
@@ -17,6 +16,7 @@ export class SignupComponent implements OnInit {
     private router: Router, private auth: AuthService) { }
 
   errorMessage: string = "";
+  connectionMade:boolean = false;
 
   user: IRegisterUser = {
     username: "",
@@ -28,6 +28,8 @@ export class SignupComponent implements OnInit {
   onCreate(): void {
     if (this.user.password == this.user.confirmPassword) {
       this.errorMessage = "";
+      this.connectionMade = true;
+
       this.service.register(this.user)
         .subscribe(
           (response: any) => {
@@ -38,6 +40,8 @@ export class SignupComponent implements OnInit {
             }
             else {
               this.errorMessage = "";
+              this.connectionMade = false;
+
               response.errors.forEach(element => {
                 switch (element.code) {
                   case 'DuplicateUserName':
@@ -55,6 +59,7 @@ export class SignupComponent implements OnInit {
             }
           },
           error => {
+            this.connectionMade = false;
             console.log(error);
           }
         );

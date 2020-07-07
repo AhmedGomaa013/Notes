@@ -3,9 +3,7 @@ import { IRegisterUser } from "./register-user";
 import { HttpClient, HttpHeaderResponse } from "@angular/common/http";
 import { ILoginUser } from "./login-user";
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable()
 
 export class UserService {
   constructor(private http: HttpClient) { }

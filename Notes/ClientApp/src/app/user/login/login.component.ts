@@ -1,11 +1,10 @@
 import { Component, OnInit } from "@angular/core";
 import { Title } from "@angular/platform-browser";
-import { ILoginUser } from "../shared/login-user";
-import { UserService } from "../shared/user-service";
+import { ILoginUser } from "../../shared/login-user";
+import { UserService } from "../../shared/user-service";
 import { Router } from '@angular/router';
 import { ToastrService } from "ngx-toastr";
-import { Local } from "protractor/built/driverProviders";
-import { AuthService } from "../shared/AuthService";
+import { AuthService } from "../../shared/AuthService";
 
 
 @Component({
@@ -18,13 +17,16 @@ export class LoginComponent implements OnInit {
     private toastrService: ToastrService, private auth: AuthService) { }
 
   errorMessage: string = "";
+  connectionMade: boolean = false;
+
   user: ILoginUser = {
     username: "",
     password: ""
   };
 
   onLogin(): void {
-    
+    this.connectionMade = true;
+
     this.loginService.login(this.user).subscribe(
       (response: any) => {
         localStorage.setItem('token', response.token);
@@ -32,6 +34,7 @@ export class LoginComponent implements OnInit {
         this.router.navigateByUrl(this.user.username);
       },
       err => {
+        this.connectionMade = false;
         if (err.status == 400)
         {
           this.toastrService.error('Incorrect Username or Password', 'Authentication Failed');

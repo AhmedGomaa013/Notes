@@ -1,12 +1,10 @@
 <nav class="navbar py-3 bg-info text-white">
-  <a [routerLink]="['/']" class="btn float-left text-white" (click)="login()" >
+  <a [routerLink]="['/']" class="btn float-left text-white" >
     <img src="assets\svg\book-black-18dp.svg" class="float-left" />
-    <div class="float-left">Notes</div>
+    <div class="float-left" style="font-size:larger;">Notes</div>
   </a>
 
   <div class="float-right buttons">
-    <a [routerLink]="[getUsername()]" class="btn btn-sm btn-link text-white" *ngIf="auth.isLoggedIn()">Your Notes</a>
-
     <a [routerLink]="['/login']" class="btn btn-sm btn-link text-white" *ngIf="!auth.isLoggedIn()">Log In</a>
     <a [routerLink]="['/signup']" class="btn btn-sm bg-white text-info font-weight-bold" *ngIf="!auth.isLoggedIn()">Sign Up</a>
 

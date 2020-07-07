@@ -34,9 +34,10 @@ namespace Notes
             services.AddIdentity<NotesUser,IdentityRole>()
                 .AddEntityFrameworkStores<NotesContext>()
                 .AddDefaultTokenProviders();
+           
             services.AddDbContext<NotesContext>(options =>
             {
-                var stringConnection = Environment.GetEnvironmentVariable("ASPNETCORE_CONNECTIONSTRINGS:DeFaultString");
+                var stringConnection = Environment.GetEnvironmentVariable("CONNECTIONSTRINGS");
 
                 options.UseSqlServer(stringConnection);
             }

@@ -8,7 +8,7 @@ import { Injectable } from "@angular/core";
 export class DataService {
 
   private baseUrl = 'api/notes/';
-  private deleteAllUrl = 'api/notes';
+  
 
   public notes: INote[] = [];
   constructor(private http: HttpClient) { }
@@ -34,7 +34,7 @@ export class DataService {
   }
 
   deleteAllNotes() {
-    return this.http.delete(this.deleteAllUrl)
+    return this.http.delete(this.baseUrl)
       .pipe(catchError(this.handleError));
   }
 

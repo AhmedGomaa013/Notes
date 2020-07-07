@@ -13,8 +13,10 @@
            aria-label="Search" [(ngModel)]="searchValue">
   </div>
 
-  <div class="col-md-1 ml-2">
-    <input type="submit" class="btn btn-default text-info" value="Sort" (click)="onSort()" />
+  <div class="pt-2">
+    <a class="btn btn-default" title="Sort {{sortType?'Ascending':'Descending'}}" (click)="onSort()">
+      <img src="assets\svg\sort_by_alpha-24px.svg" />
+    </a>
   </div>
 </div>
 

@@ -1,13 +1,12 @@
 import { Component, OnInit } from "@angular/core";
-import { INote } from "../shared/note";
-import { DataService } from "../shared/data-service";
+import { INote } from "../../shared/note";
+
 import { MatDialog } from "@angular/material/dialog";
 import { OpenDialogComponent } from "../dialog/open-dialog.component";
-import { AuthService } from "../shared/AuthService";
+
 import { Router } from "@angular/router";
-
-
-
+import { AuthService } from "src/app/shared/AuthService";
+import { DataService } from "src/app/shared/data-service"
 
 
 @Component({
@@ -15,9 +14,9 @@ import { Router } from "@angular/router";
   templateUrl:'./notes.component.html'
 })
 
+
 export class NotesComponent implements OnInit {
-  constructor(private data: DataService, private router: Router,
-    public dialog: MatDialog, private auth: AuthService) { }
+  constructor(private data: DataService, private router: Router,public dialog: MatDialog, private auth: AuthService) { }
 
   _searchValue: string = "";
   get searchValue(): string {
@@ -38,10 +37,10 @@ export class NotesComponent implements OnInit {
   noteBodyShow: boolean = false;
   newNoteShow: boolean = false;
   isSorted: boolean = false;
+  sortType: boolean = true; //true for ascending order ..... false for descending order
 
   notesList: INote[] = [];
   filteredNotesList: INote[] = [];
-
 
   performFilter(filterBy: string): INote[] {
     filterBy = filterBy.toLocaleLowerCase();
@@ -52,11 +51,29 @@ export class NotesComponent implements OnInit {
 
   onSort() {
     this.isSorted = true;
+
+    if (this.sortType)
+      this.ascendingSort();
+    else
+      this.descendingSort();
+
+    this.sortType = !this.sortType;
+  }
+  ascendingSort() {
     this.notesList.sort((a, b) => {
       const first = a.noteTitle.toLowerCase();
       const second = b.noteTitle.toLowerCase();
       if (first > second) return 1;
       else if (first < second) return -1;
+      return 0;
+    });
+  }
+  descendingSort() {
+    this.notesList.sort((a, b) => {
+      const first = a.noteTitle.toLowerCase();
+      const second = b.noteTitle.toLowerCase();
+      if (first < second) return 1;
+      else if (first > second) return -1;
       return 0;
     });
   }
@@ -94,7 +111,6 @@ export class NotesComponent implements OnInit {
       this.noteBodyShow = false;
     }
   }
-
   onDeleteAll() {
     this.newNoteShow = false;
     this.data.deleteAllNotes()
@@ -122,7 +138,6 @@ export class NotesComponent implements OnInit {
     this.tempNoteBody = "";
     this.tempNoteTitle = "";
   }
-
   onAddNote() {
     this.noteBodyShow = false;
     this.newNoteShow = false;
@@ -144,17 +159,19 @@ export class NotesComponent implements OnInit {
     if (this.isSorted)
       this.onSort();
   }
-
   onCancelAddNote() {
     this.newNoteShow = false;
     this.noteBodyShow = false;
   }
 
   ngOnInit() {
-    if (this.auth.isLoggedIn() == null)
-    {
+    if (!this.auth.isLoggedIn()) {
       this.router.navigateByUrl('login');
     }
+    else if (('/' + localStorage.getItem('username')) != this.router.url) {
+      this.router.navigateByUrl('/');
+    }
+
     this.data.getNotes()
       .subscribe({
         next: notes => {

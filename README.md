@@ -11,3 +11,10 @@ $git clone https://github.com/AhmedGomaa013/Notes.git
     * .NET Core CLI: dotnet ef database update.
     * Vs PowerShell: Update-Database
 5. Build and Run the Project.
+
+# Technpligies Used
+
+* Asp.Net MVC Core: 3.1.301
+* Entity FrameWork: 3.1.5
+* Angular: 8.2.12
+* Angular CLI: 8.3.14
